@@ -1,0 +1,7 @@
+Package: users-polls
+Architecture: all
+Maintainer: Christos Karvouniaris
+Depends: python3(>=3.9.2-3), python3-venv(>=3.9.2-3), python3-dev (>=3.9.2-3)
+Priority: optional
+Version: 1.0.0+deb11
+Description: Users polls service

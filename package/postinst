@@ -1,0 +1,47 @@
+#!/bin/bash
+
+if [ "$(systemctl is-active users-polls)" = "active" ]
+then
+    echo "users-polls service is $(systemctl is-active users-polls), stopping"
+    systemctl stop users-polls.service
+fi
+
+package_dir='/usr/share/users-polls/'
+python_virtual_env='python_venv'
+
+# create virtual environment and install utilities
+echo "Creating python virtual environment"
+/usr/bin/python3 -m venv ${package_dir}${python_virtual_env}
+echo "Activating python virtual environment"
+source ${package_dir}${python_virtual_env}/bin/activate
+echo "Installing python dependencies in virtual environment"
+pip3 install -r /usr/share/users-polls/requirements.txt
+
+# create users-polls service file
+cat <<EOF > /etc/systemd/system/users-polls.service
+[Unit]
+Description=The Users Polls Service
+After=network.target
+
+[Service]
+ExecStart=${package_dir}${python_virtual_env}/bin/python3 main.py
+WorkingDirectory=${package_dir}
+StandardOutput=inherit
+StandardError=inherit
+Restart=on-failure
+RestartSec=10
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+
+# reload and start systemd services
+echo "Systemd daemon reload"
+systemctl daemon-reload
+echo "Enabling users-polls service"
+systemctl enable users-polls.service
+echo "Starting users-polls service"
+systemctl start users-polls.service

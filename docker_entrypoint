@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+set -x
+
+echo "# Starting server..."
+python3 /usr/share/users-polls/main.py
