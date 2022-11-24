@@ -6,10 +6,6 @@ from datetime import datetime
 class OptionIn(BaseModel):
     value: str
 
-    class Config:
-        orm_mode = True
-
-
 class OptionOut(OptionIn):
     id: int
 
@@ -20,12 +16,9 @@ class OptionOut(OptionIn):
 class PollsIn(BaseModel):
     name: str
     description: str
+    owner : str
     start_date: Optional[datetime] = None
     end_date: datetime
-    options: Optional[List[OptionOut]] = []
-
-    class Config:
-        orm_mode = True
 
 
 class PollsOut(PollsIn):
@@ -35,10 +28,13 @@ class PollsOut(PollsIn):
         orm_mode = True
 
 
-class Vote(BaseModel):
+class VoteIn(BaseModel):
     username : str
-    poll_id : int
-    option : int
+    poll_id : PollsOut.id
+    option_id : OptionOut.id
+
+class VoteOut(VoteIn):
+    vote_timestamp : datetime
 
     class Config:
         orm_mode = True

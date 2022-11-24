@@ -1,25 +1,32 @@
-from sqlalchemy import Column, DateTime, Integer, String
-# from sqlalchemy.sql import func
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy.sql import func
 from database import Base
+from sqlalchemy.orm import relationship
 
-class Users(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=False)
-    age = Column(Integer)
-    name = Column(String)
-    surname = Column(String)
-
-class Polls(Base):
+class Poll(Base):
     __tablename__ = "polls"
     id = Column(Integer, primary_key=True, index=False)
-    name = Column(Integer)
+    name = Column(String)
     description = Column(String)
-    # foreign key relation for user id
+    owner = Column(String)
+    start_date = Column(DateTime, default=func.now())
+    end_date = Column(DateTime, default=func.now())
 
-class Votes(Base):
-    __tablename__ = "votes"
+    options = relationship("Option", back_populates="poll")
+
+class Option(Base):
+    __tablename__ = "options"
     id = Column(Integer, primary_key=True, index=False)
-    name = Column(Integer)
-    description = Column(String)
-    # foreign key relation for user id
-    # foreign key relation for poll id
+    value = Column(String)
+    poll_id = Column(Integer, ForeignKey("polls.id"))
+
+    votes = relationship("Vote", back_populates="poll")
+    poll = relationship("Poll", back_populates="options")
+
+class Vote(Base):
+    __tablename__ = "votes"
+    username = Column(String, primary_key=True, index=False)
+    vote_timestamp = Column(DateTime, default=func.now())
+    option_id = Column(Integer, ForeignKey("options.id"))
+
+    option = relationship("Option", back_populates="votes")
