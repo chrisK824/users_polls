@@ -19,6 +19,7 @@ class PollsIn(BaseModel):
     owner : str
     start_date: Optional[datetime] = None
     end_date: datetime
+    options: Optional[List[OptionIn]] = []
 
 
 class PollsOut(PollsIn):
