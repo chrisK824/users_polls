@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import database_crud, db_models
 from database import SessionLocal, engine
-from schemas import UserIn, UserOut
+from schemas import OptionIn, OptionOut, PollsIn, PollsOut, Vote
 from typing import List
 
 db_models.Base.metadata.create_all(bind=engine)
@@ -27,6 +27,7 @@ votes for a poll.
 You will be able to:
 
 * Create new poll.
+* Add options to a poll.
 * List open polls.
 * Vote on a poll.
 * Show poll votes.
@@ -48,23 +49,10 @@ usersPollsAPI = FastAPI(
 
 usersPollsAPI.add_middleware(CORSMiddleware, allow_origins=['*'])
 
-@usersPollsAPI.post("/v1/users", response_model=UserOut, summary ="Create a user for the poll app", tags=["Users"])
-def get_users(user_in: UserIn, db: Session = Depends(get_users_polls_db)):
+@usersPollsAPI.post("/v1/polls", response_model=PollsOut, summary ="Create a poll", tags=["Polls"])
+def create_poll(poll_in: PollsIn, db: Session = Depends(get_users_polls_db)):
     """
-    Creates a user for the poll app
-    """
-    try:
-        result = {}
-        return result
-    except HTTPException as e:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
-
-@usersPollsAPI.get("/v1/users", response_model=List[UserOut], summary ="Get all users of the poll app", tags=["Users"])
-def get_users(db: Session = Depends(get_users_polls_db)):
-    """
-    Returns all users of the poll app
+    Creates a poll
     """
     try:
         result = {}
@@ -74,10 +62,24 @@ def get_users(db: Session = Depends(get_users_polls_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
-@usersPollsAPI.get("/v1/users/{user_id}", response_model=UserOut, summary ="Get a users of the poll app given an ID", tags=["Users"])
-def get_users(user_id : int, db: Session = Depends(get_users_polls_db)):
+@usersPollsAPI.get("/v1/polls", response_model=List[PollsOut], summary ="Get all active polls and optionally adds the inactive ones", tags=["Polls"])
+def get_polls(active : bool = True, db: Session = Depends(get_users_polls_db)):
     """
-    Returns a user of the poll app,
+    Returns all active polls
+    and optionally adds the inactive ones
+    """
+    try:
+        result = {}
+        return result
+    except HTTPException as e:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
+
+@usersPollsAPI.get("/v1/polls/{poll_id}", response_model=PollsOut, summary ="Get a poll given an ID", tags=["Polls"])
+def get_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
+    """
+    Returns a poll,
     given an ID.
     """
     try:
