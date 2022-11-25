@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Date
 from sqlalchemy.sql import func
 from database import Base
 from sqlalchemy.orm import relationship
@@ -10,8 +10,8 @@ class Poll(Base):
     title = Column(String)
     description = Column(String)
     owner = Column(String)
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
+    start_date = Column(Date)
+    end_date = Column(Date)
 
     options = relationship("Option", back_populates="poll")
 
