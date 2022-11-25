@@ -1,25 +1,35 @@
-from pydantic import BaseModel, Optional
+from pydantic import BaseModel
 from typing import List
 from datetime import datetime
 
 
-class OptionIn(BaseModel):
-    value: str
+class VoteIn(BaseModel):
+    username: str
+    poll_id: int
+    option_id: int
 
-class OptionOut(OptionIn):
+
+class VoteOut(VoteIn):
+    vote_timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+class Option(BaseModel):
     id: int
-
+    value: str
+    votes : List[VoteOut]
     class Config:
         orm_mode = True
 
 
 class PollsIn(BaseModel):
-    name: str
+    title: str
     description: str
-    owner : str
-    start_date: Optional[datetime] = None
+    owner: str
+    start_date: datetime
     end_date: datetime
-    options: Optional[List[OptionIn]] = []
+    options: List[str]
 
 
 class PollsOut(PollsIn):
@@ -29,13 +39,6 @@ class PollsOut(PollsIn):
         orm_mode = True
 
 
-class VoteIn(BaseModel):
-    username : str
-    poll_id : PollsOut.id
-    option_id : OptionOut.id
 
-class VoteOut(VoteIn):
-    vote_timestamp : datetime
-
-    class Config:
-        orm_mode = True
+class PollWinner(BaseModel):
+    username: str

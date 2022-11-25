@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import database_crud, db_models
 from database import SessionLocal, engine
-from schemas import OptionIn, OptionOut, PollsIn, PollsOut, Vote
+from schemas import PollsIn, PollsOut, VoteIn, VoteOut,PollWinner
 from typing import List
 
 db_models.Base.metadata.create_all(bind=engine)
@@ -49,13 +49,14 @@ usersPollsAPI = FastAPI(
 
 usersPollsAPI.add_middleware(CORSMiddleware, allow_origins=['*'])
 
-@usersPollsAPI.post("/v1/polls", response_model=PollsOut, summary ="Create a poll", tags=["Polls"])
+@usersPollsAPI.post("/v1/polls", summary ="Create a poll", tags=["Polls"])
 def create_poll(poll_in: PollsIn, db: Session = Depends(get_users_polls_db)):
     """
     Creates a poll
     """
     try:
-        result = {}
+        create_poll(poll_in, db)
+        result = {"result" : f"{poll_in.owner} your poll with title '{poll_in.title}' has been created successfully and will be valid from {poll_in.start_date} until {poll_in.end_date}"}
         return result
     except HTTPException as e:
         raise
@@ -81,6 +82,49 @@ def get_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
     """
     Returns a poll,
     given an ID.
+    """
+    try:
+        result = {}
+        return result
+    except HTTPException as e:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
+
+@usersPollsAPI.get("/v1/votes", response_model=PollsOut, summary ="Get votes for a given poll ID", tags=["Votes"])
+def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
+    """
+    Returns votes for a,
+    given poll ID.
+    """
+    try:
+        result = {}
+        return result
+    except HTTPException as e:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
+
+@usersPollsAPI.post("/v1/votes", response_model=List[VoteOut], summary ="Vote for an option of a given poll ID", tags=["Votes"])
+def get_poll_winner(vote : VoteIn, db: Session = Depends(get_users_polls_db)):
+    """
+    Votes as a username for
+    an option of a,
+    given poll ID.
+    """
+    try:
+        result = {}
+        return result
+    except HTTPException as e:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
+
+@usersPollsAPI.get("/v1/polls/{poll_id}/winner", response_model=PollWinner, summary ="Select random username as winner for a given poll ID", tags=["Polls winners"])
+def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
+    """
+    Select random username
+    as winner for a given poll ID.
     """
     try:
         result = {}
