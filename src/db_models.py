@@ -13,23 +13,23 @@ class Poll(Base):
     start_date = Column(DateTime)
     end_date = Column(DateTime)
 
-#     options = relationship("Option", back_populates="poll")
+    options = relationship("Option", back_populates="poll")
 
 
-# class Option(Base):
-#     __tablename__ = "options"
-#     id = Column(Integer, primary_key=True, index=False)
-#     value = Column(String)
-#     poll_id = Column(Integer, ForeignKey("polls.id"))
+class Option(Base):
+    __tablename__ = "options"
+    id = Column(Integer, primary_key=True, index=False)
+    value = Column(String)
+    poll_id = Column(Integer, ForeignKey("polls.id"))
 
-#     poll = relationship("Poll", back_populates="options")
-#     votes = relationship("Vote", back_populates="poll")
+    poll = relationship("Poll", back_populates="options")
+    votes = relationship("Vote", back_populates="option")
 
 
-# class Vote(Base):
-#     __tablename__ = "votes"
-#     username = Column(String, primary_key=True, index=False)
-#     vote_timestamp = Column(DateTime, default=func.now())
-#     option_id = Column(Integer, ForeignKey("options.id"))
+class Vote(Base):
+    __tablename__ = "votes"
+    username = Column(String, primary_key=True, index=False)
+    vote_timestamp = Column(DateTime, default=func.now())
+    option_id = Column(Integer, ForeignKey("options.id"))
 
-#     option = relationship("Option", back_populates="votes")
+    option = relationship("Option", back_populates="votes")

@@ -55,7 +55,7 @@ def create_poll(poll_in: PollsIn, db: Session = Depends(get_users_polls_db)):
     Creates a poll
     """
     try:
-        create_poll(poll_in, db)
+        database_crud.create_poll(poll_in, db)
         result = {"result" : f"{poll_in.owner} your poll with title '{poll_in.title}' has been created successfully and will be valid from {poll_in.start_date} until {poll_in.end_date}"}
         return result
     except HTTPException as e:
