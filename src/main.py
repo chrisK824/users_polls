@@ -64,13 +64,13 @@ def create_poll(poll_in: PollsIn, db: Session = Depends(get_users_polls_db)):
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
 @usersPollsAPI.get("/v1/polls", response_model=List[PollsOut], summary ="Get all active polls and optionally adds the inactive ones", tags=["Polls"])
-def get_polls(active : bool = True, db: Session = Depends(get_users_polls_db)):
+def get_polls(inactive : bool = False, db: Session = Depends(get_users_polls_db)):
     """
     Returns all active polls
     and optionally adds the inactive ones
     """
     try:
-        result = {}
+        result = database_crud.get_polls(inactive, db)
         return result
     except HTTPException as e:
         raise
