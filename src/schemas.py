@@ -60,6 +60,3 @@ class PollsOut(PollsIn):
     class Config:
         orm_mode = True
 
-
-class PollWinner(BaseModel):
-    username: str

@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import database_crud, db_models
 from database import SessionLocal, engine
-from schemas import PollsIn, PollsOut, VoteIn, VoteOut,PollWinner, VotesOut
+from schemas import PollsIn, PollsOut, VoteIn, VoteOut, VotesOut
 from typing import List
 
 db_models.Base.metadata.create_all(bind=engine)
@@ -142,14 +142,14 @@ def vote_for_poll(vote : VoteIn, db: Session = Depends(get_users_polls_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
-@usersPollsAPI.get("/v1/polls/{poll_id}/winner", response_model=PollWinner, summary ="Select random username as winner for a given poll ID", tags=["Polls winners"])
+@usersPollsAPI.get("/v1/polls/{poll_id}/winner", summary ="Select random username as winner for a given poll ID", tags=["Polls winners"])
 def get_poll_winner(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
     """
     Select random username
     as winner for a given poll ID.
     """
     try:
-        result = {}
+        result = {"result" : f"Winner for poll with ID {poll_id} is {database_crud.select_random_winner(poll_id, db)}"}
         return result
     except HTTPException as e:
         raise

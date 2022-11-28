@@ -103,3 +103,8 @@ def get_votes(poll_id: int, db: Session):
     WHERE votes.poll_id = (%s);"""
     votes = db.execute(text(query % str(poll_id))).fetchall()
     return votes
+
+def select_random_winner(poll_id : int, db : Session):
+    query = """SELECT username from votes WHERE poll_id = (%s) ORDER BY RANDOM() LIMIT 1"""
+    username = db.execute(text(query % str(poll_id))).fetchone()[0]
+    return username
