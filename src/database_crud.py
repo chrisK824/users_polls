@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 import db_models
-from schemas import PollsIn, OptionIn, OptionOut
+from schemas import PollsIn, OptionIn
+from datetime import datetime
 
 
 def create_option(option: OptionIn, poll_id, db: Session):
@@ -25,19 +26,12 @@ def create_poll(poll: PollsIn, db: Session):
 
 
 def get_polls(inactive : bool, db: Session):
-    polls = list(db.query(db_models.Poll).all())
-    for poll in polls:
-        print(poll.title)
-        print(poll.id)
-        print(poll.start_date)
-        poll.options = []
-        # for option in list(db.query(db_models.Option).filter(db_models.Option.poll_id==poll.id).all()):
-        #     option_out = OptionOut(id = option.id, value=option.value)
-        #     poll.options.append(option_out)
-
+    if inactive:
+        polls = db.query(db_models.Poll).all()
+    else:
+        polls= db.query(db_models.Poll).filter(db_models.Poll.end_date >= datetime.utcnow()).filter(db_models.Poll.start_date <= datetime.utcnow()).all()
     return polls
-    # options = list(db.query(db_models.Option).all())
-    # for option in options:
-    #     print(option.id)
-    #     print(option.value)
-    #     print(option.poll_id)
+
+def get_poll(poll_id: int, db: Session):
+    poll = db.query(db_models.Poll).filter(db_models.Poll.id == poll_id).first()
+    return poll

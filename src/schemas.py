@@ -37,14 +37,15 @@ class PollsIn(BaseModel):
     owner: str
     start_date: date
     end_date: date
-    options: List[OptionOut]
+    options: List[OptionIn]
 
 
 class PollsOut(PollsIn):
     id: int
-    options: List[OptionOut]
+    options: list
     class Config:
         orm_mode = True
+
 
 
 class PollWinner(BaseModel):

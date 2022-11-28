@@ -84,7 +84,7 @@ def get_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
     given an ID.
     """
     try:
-        result = {}
+        result = database_crud.get_poll(poll_id=poll_id, db=db)
         return result
     except HTTPException as e:
         raise
