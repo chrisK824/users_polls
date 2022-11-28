@@ -1,10 +1,10 @@
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, Request, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import database_crud, db_models
 from database import SessionLocal, engine
-from schemas import PollsIn, PollsOut, VoteIn, VoteOut,PollWinner
+from schemas import PollsIn, PollsOut, VoteIn, VoteOut,PollWinner, VotesOut
 from typing import List
 
 db_models.Base.metadata.create_all(bind=engine)
@@ -91,37 +91,41 @@ def get_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
-@usersPollsAPI.get("/v1/votes", response_model=PollsOut, summary ="Get votes for a given poll ID", tags=["Votes"])
+@usersPollsAPI.get("/v1/votes", response_model=List[VotesOut], summary ="Get votes for a given poll ID", tags=["Votes"])
 def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
     """
     Returns votes for a,
     given poll ID.
     """
     try:
-        result = {}
+        result = database_crud.get_votes(poll_id=poll_id, db=db)
         return result
     except HTTPException as e:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
-@usersPollsAPI.post("/v1/votes", response_model=List[VoteOut], summary ="Vote for an option of a given poll ID", tags=["Votes"])
-def get_poll_winner(vote : VoteIn, db: Session = Depends(get_users_polls_db)):
+@usersPollsAPI.post("/v1/votes", response_model=VoteOut, summary ="Vote for an option of a given poll ID", tags=["Votes"])
+def vote_for_poll(vote : VoteIn, db: Session = Depends(get_users_polls_db)):
     """
     Votes as a username for
     an option of a,
     given poll ID.
     """
     try:
-        result = {}
+        result = database_crud.post_vote(vote=vote, db=db)
         return result
     except HTTPException as e:
         raise
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=f"{e}")
+    except database_crud.DuplicateError as e:
+        raise HTTPException(status_code=403, detail=f"{e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
 @usersPollsAPI.get("/v1/polls/{poll_id}/winner", response_model=PollWinner, summary ="Select random username as winner for a given poll ID", tags=["Polls winners"])
-def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
+def get_poll_winner(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
     """
     Select random username
     as winner for a given poll ID.

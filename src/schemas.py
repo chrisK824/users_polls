@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime, date
 
 
 class VoteIn(BaseModel):
     username: str
-    poll_id: int
-    option_id: int
+    poll_id: int = Field(..., gt=0)
+    option_id: int = Field(..., gt=0)
 
 
 class VoteOut(VoteIn):
@@ -15,21 +15,34 @@ class VoteOut(VoteIn):
     class Config:
         orm_mode = True
 
+
+class VotesOut(BaseModel):
+    username: str
+    vote_timestamp: datetime
+    title: str
+    value: str
+
+
+class VoteOut(VoteIn):
+    vote_timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
 class OptionIn(BaseModel):
     value: str
 
 
 class Option(BaseModel):
-    id : int
+    id: int
     value: str
-    poll_id : int
-    votes : List[VoteOut]
+    poll_id: int
+    votes: List[VoteOut]
+
     class Config:
         orm_mode = True
 
-class OptionOut(BaseModel):
-    id : int
-    value: str
 
 class PollsIn(BaseModel):
     title: str
@@ -43,9 +56,9 @@ class PollsIn(BaseModel):
 class PollsOut(PollsIn):
     id: int
     options: list
+
     class Config:
         orm_mode = True
-
 
 
 class PollWinner(BaseModel):
