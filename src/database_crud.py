@@ -5,8 +5,10 @@ import db_models
 from schemas import PollsIn, OptionIn, VoteIn
 from datetime import datetime
 
-
 class DuplicateError(Exception):
+    pass
+
+class InactivePollError(Exception):
     pass
 
 
@@ -16,6 +18,15 @@ def create_option(option: OptionIn, poll_id, db: Session):
 
 
 def create_poll(poll: PollsIn, db: Session):
+    now = datetime.utcnow()
+    start_date_datetime = datetime(poll.start_date.year, poll.start_date.month, poll.start_date.day)
+    end_date_datetime = datetime(poll.end_date.year, poll.end_date.month, poll.end_date.day)
+
+    if end_date_datetime <= start_date_datetime:
+        raise InactivePollError("Cannot post a poll with end date equal or older than start date")
+    if end_date_datetime <= now:
+        raise InactivePollError("Cannot post a poll with end date in the past")
+
     db_poll_entry = db_models.Poll(
         title=poll.title,
         description=poll.description,
@@ -47,25 +58,28 @@ def get_poll(poll_id: int, db: Session):
 
 
 def post_vote(vote: VoteIn, db: Session):
-    option = db.query(db_models.Option).filter(db_models.Option.id == vote.option_id).filter(
-        db_models.Option.poll_id == vote.poll_id).first()
-    if option:
-        try:
-            db_vote_entry = db_models.Vote(
-                username=vote.username,
-                option_id=vote.option_id,
-                poll_id=vote.poll_id
-            )
-            db.add(db_vote_entry)
-            db.commit()
-            return db_vote_entry
-        except IntegrityError:
-            db.rollback()
-            raise DuplicateError(
-                f"User {vote.username} has already voted for poll {vote.poll_id}")
+    poll = db.query(db_models.Poll).filter(db_models.Poll.id == vote.poll_id).filter(
+        db_models.Poll.start_date < datetime.utcnow()).filter(db_models.Poll.end_date > datetime.utcnow()).first()
+    if poll:
+        option = db.query(db_models.Option).filter(db_models.Option.id == vote.option_id).filter(
+            db_models.Option.poll_id == vote.poll_id).first()
+        if option:
+            try:
+                db_vote_entry = db_models.Vote(
+                    username=vote.username,
+                    option_id=vote.option_id,
+                    poll_id=vote.poll_id
+                )
+                db.add(db_vote_entry)
+                db.commit()
+                return db_vote_entry
+            except IntegrityError:
+                db.rollback()
+                raise DuplicateError(f"User {vote.username} has already voted for poll {vote.poll_id}")
+        else:
+            raise ValueError(f"There is no option {vote.option_id} for poll {vote.poll_id}")
     else:
-        raise ValueError(
-            f"There is no option {vote.option_id} for poll {vote.poll_id}")
+        raise InactivePollError(f"Pool {vote.poll_id} is already closed")
 
 
 def get_votes(poll_id: int, db: Session):

@@ -58,6 +58,8 @@ def create_poll(poll_in: PollsIn, db: Session = Depends(get_users_polls_db)):
         database_crud.create_poll(poll_in, db)
         result = {"result" : f"{poll_in.owner} your poll with title '{poll_in.title}' has been created successfully and will be valid from {poll_in.start_date} until {poll_in.end_date}"}
         return result
+    except database_crud.InactivePollError as e:
+        raise HTTPException(status_code=403, detail=f"{e}")
     except HTTPException as e:
         raise
     except Exception as e:
@@ -119,6 +121,8 @@ def vote_for_poll(vote : VoteIn, db: Session = Depends(get_users_polls_db)):
         raise
     except ValueError as e:
         raise HTTPException(status_code=404, detail=f"{e}")
+    except database_crud.InactivePollError as e:
+        raise HTTPException(status_code=403, detail=f"{e}")
     except database_crud.DuplicateError as e:
         raise HTTPException(status_code=403, detail=f"{e}")
     except Exception as e:
