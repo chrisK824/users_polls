@@ -93,7 +93,7 @@ def post_vote(vote: VoteIn, db: Session):
             raise ValueError(
                 f"There is no option {vote.option_id} for poll {vote.poll_id}")
     else:
-        raise InactivePollError(f"Pool {vote.poll_id} is already closed")
+        raise InactivePollError(f"There is not an open poll with ID {vote.poll_id}")
 
 
 def get_votes(poll_id: int, db: Session):
