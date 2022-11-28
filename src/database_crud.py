@@ -5,8 +5,10 @@ import db_models
 from schemas import PollsIn, OptionIn, VoteIn
 from datetime import datetime
 
+
 class DuplicateError(Exception):
     pass
+
 
 class InactivePollError(Exception):
     pass
@@ -19,11 +21,14 @@ def create_option(option: OptionIn, poll_id, db: Session):
 
 def create_poll(poll: PollsIn, db: Session):
     now = datetime.utcnow()
-    start_date_datetime = datetime(poll.start_date.year, poll.start_date.month, poll.start_date.day)
-    end_date_datetime = datetime(poll.end_date.year, poll.end_date.month, poll.end_date.day)
+    start_date_datetime = datetime(
+        poll.start_date.year, poll.start_date.month, poll.start_date.day)
+    end_date_datetime = datetime(
+        poll.end_date.year, poll.end_date.month, poll.end_date.day)
 
     if end_date_datetime <= start_date_datetime:
-        raise InactivePollError("Cannot post a poll with end date equal or older than start date")
+        raise InactivePollError(
+            "Cannot post a poll with end date equal or older than start date")
     if end_date_datetime <= now:
         raise InactivePollError("Cannot post a poll with end date in the past")
 
@@ -57,6 +62,13 @@ def get_poll(poll_id: int, db: Session):
     return poll
 
 
+def delete_poll(poll_id: int, db: Session):
+    poll = db.query(db_models.Poll).filter(
+        db_models.Poll.id == poll_id).first()
+    db.delete(poll)
+    db.commit()
+
+
 def post_vote(vote: VoteIn, db: Session):
     poll = db.query(db_models.Poll).filter(db_models.Poll.id == vote.poll_id).filter(
         db_models.Poll.start_date < datetime.utcnow()).filter(db_models.Poll.end_date > datetime.utcnow()).first()
@@ -75,9 +87,11 @@ def post_vote(vote: VoteIn, db: Session):
                 return db_vote_entry
             except IntegrityError:
                 db.rollback()
-                raise DuplicateError(f"User {vote.username} has already voted for poll {vote.poll_id}")
+                raise DuplicateError(
+                    f"User {vote.username} has already voted for poll {vote.poll_id}")
         else:
-            raise ValueError(f"There is no option {vote.option_id} for poll {vote.poll_id}")
+            raise ValueError(
+                f"There is no option {vote.option_id} for poll {vote.poll_id}")
     else:
         raise InactivePollError(f"Pool {vote.poll_id} is already closed")
 

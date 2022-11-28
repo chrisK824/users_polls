@@ -93,6 +93,20 @@ def get_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
+@usersPollsAPI.delete("/v1/polls/{poll_id}", summary ="Delete a poll given an ID", tags=["Polls"])
+def delete_poll(poll_id : int, db: Session = Depends(get_users_polls_db)):
+    """
+    Deletes a poll,
+    given an ID.
+    """
+    try:
+        database_crud.delete_poll(poll_id=poll_id, db=db)
+        return {"result" : f"Poll with ID {poll_id} has been deleted"}
+    except HTTPException as e:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
+
 @usersPollsAPI.get("/v1/votes", response_model=List[VotesOut], summary ="Get votes for a given poll ID", tags=["Votes"])
 def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
     """

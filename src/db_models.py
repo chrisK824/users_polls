@@ -13,7 +13,7 @@ class Poll(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    options = relationship("Option", back_populates="poll")
+    options = relationship("Option", back_populates="poll", cascade="all,delete")
 
 
 class Option(Base):
@@ -22,8 +22,8 @@ class Option(Base):
     value = Column(String)
     poll_id = Column(Integer, ForeignKey("polls.id"))
 
-    poll = relationship("Poll", back_populates="options")
-    votes = relationship("Vote", back_populates="option")
+    poll = relationship("Poll", back_populates="options", cascade="all,delete")
+    votes = relationship("Vote", back_populates="option", cascade="all,delete")
 
 
 class Vote(Base):
@@ -35,4 +35,4 @@ class Vote(Base):
     __table_args__ = (UniqueConstraint(
         'username', 'poll_id', name='username_poll'),)
 
-    option = relationship("Option", back_populates="votes")
+    option = relationship("Option", back_populates="votes", cascade="all,delete")
