@@ -24,14 +24,14 @@ for poll in polls:
     for option in poll["options"]:
         polls_choices[poll["title"]][option["value"]] = [vote['value'] for vote in votes].count(option["value"])
 
-plots_per_row = 3
-subplot_rows = round(len(polls)/3)
+figure = plt.figure(figsize= [10, 10])
+figure.tight_layout()
+plot_columns = 2
+plot_rows = round(len(polls)/plot_columns)
 
-subplot_row = 1
+plot_place = 1
 for poll_title, poll_votes in polls_choices.items():
-    figure = plt.figure(figsize=[10,10])
-    subplot_columns = 1
-    poll_plt = figure.add_subplot(1,1,1)
+    poll_plt = figure.add_subplot(plot_rows, plot_columns, plot_place)
     poll_plt.set_title(poll_title)
     x_axis = []
     y_axis = []
@@ -46,16 +46,13 @@ for poll_title, poll_votes in polls_choices.items():
             explode=[0.01 for i in range(len(x_axis))],
             autopct="%1.1f%%")
     elif chart_type == "bar":
-        poll_plt.set_xlabel("Choices")
-        poll_plt.set_ylabel("votes")
         poll_plt.bar(
             x_axis,
             y_axis
         )
-    if subplot_row == 3:
-        subplot_row = subplot_row + 1
-    else:
-        subplot_row = 1
-plt.show()
+    plot_place += 1
 
+
+plt.show()
+figure.savefig("polls_charts.png", bbox_inches="tight")
     
