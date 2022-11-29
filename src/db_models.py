@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Date, UniqueConstraint
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Date, PrimaryKeyConstraint
 from sqlalchemy.sql import func
 from database import Base
 from sqlalchemy.orm import relationship
@@ -28,11 +28,11 @@ class Option(Base):
 
 class Vote(Base):
     __tablename__ = "votes"
-    username = Column(String, primary_key=True, index=False)
+    username = Column(String)
     vote_timestamp = Column(DateTime, default=func.now())
     poll_id = Column(Integer, ForeignKey("polls.id"))
     option_id = Column(Integer, ForeignKey("options.id"))
-    __table_args__ = (UniqueConstraint(
+    __table_args__ = (PrimaryKeyConstraint(
         'username', 'poll_id', name='username_poll'),)
 
     option = relationship("Option", back_populates="votes", cascade="all,delete")
