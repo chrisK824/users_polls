@@ -13,7 +13,8 @@ class Poll(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    options = relationship("Option", back_populates="poll", cascade="all,delete")
+    options = relationship(
+        "Option", back_populates="poll", cascade="all,delete")
 
 
 class Option(Base):
@@ -35,4 +36,5 @@ class Vote(Base):
     __table_args__ = (PrimaryKeyConstraint(
         'username', 'poll_id', name='username_poll'),)
 
-    option = relationship("Option", back_populates="votes", cascade="all,delete")
+    option = relationship(
+        "Option", back_populates="votes", cascade="all,delete")
