@@ -43,6 +43,11 @@ class Option(BaseModel):
     class Config:
         orm_mode = True
 
+class OptionOut(BaseModel):
+    id: int
+    value: str
+    class Config:
+        orm_mode = True
 
 class PollsIn(BaseModel):
     title: str
@@ -55,7 +60,7 @@ class PollsIn(BaseModel):
 
 class PollsOut(PollsIn):
     id: int
-    options: list
+    options: List[OptionOut]
 
     class Config:
         orm_mode = True

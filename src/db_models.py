@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Date, PrimaryKeyConstraint
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Date, PrimaryKeyConstraint, Boolean
 from sqlalchemy.sql import func
 from database import Base
 from sqlalchemy.orm import relationship
@@ -33,6 +33,7 @@ class Vote(Base):
     vote_timestamp = Column(DateTime, default=func.now())
     poll_id = Column(Integer, ForeignKey("polls.id"))
     option_id = Column(Integer, ForeignKey("options.id"))
+    validated = Column(Boolean, default= False)
     __table_args__ = (PrimaryKeyConstraint(
         'username', 'poll_id', name='username_poll'),)
 
