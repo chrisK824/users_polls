@@ -100,11 +100,12 @@ def get_votes(poll_id: int, db: Session):
     query = """SELECT username, vote_timestamp, title, value
     FROM votes INNER JOIN options ON votes.option_id = options.id
     INNER JOIN polls ON options.poll_id = polls.id
-    WHERE votes.poll_id = (%s);"""
+    WHERE votes.poll_id = (%s)
+    AND votes.validated = true;"""
     votes = db.execute(text(query % str(poll_id))).fetchall()
     return votes
 
 def select_random_winner(poll_id : int, db : Session):
-    query = """SELECT username from votes WHERE poll_id = (%s) ORDER BY RANDOM() LIMIT 1"""
+    query = """SELECT username from votes WHERE poll_id = (%s) AND votes.validated = true ORDER BY RANDOM() LIMIT 1"""
     username = db.execute(text(query % str(poll_id))).fetchone()[0]
     return username
