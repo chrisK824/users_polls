@@ -4,7 +4,7 @@ from datetime import datetime, date
 
 
 class VoteIn(BaseModel):
-    username: str
+    email: str
     poll_id: int = Field(..., gt=0)
     option_id: int = Field(..., gt=0)
 
@@ -17,7 +17,7 @@ class VoteOut(VoteIn):
 
 
 class VotesOut(BaseModel):
-    username: str
+    email: str
     vote_timestamp: datetime
     title: str
     value: str
