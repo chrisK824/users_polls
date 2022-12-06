@@ -147,8 +147,8 @@ def vote_for_poll(vote : VoteIn, request : Request, db: Session = Depends(get_us
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
-@usersPollsAPI.get("/v1/votes/validation", response_model=VoteOut, summary="Validate a vote", tags=["Votes"])
-def activate_user(poll_id : int, email: str, db: Session = Depends(get_users_polls_db)):
+@usersPollsAPI.get("/v1/votes/validation", response_model=VoteOut, summary="Validate a vote", tags=["Votes"], include_in_schema=False)
+def validate_vote(poll_id : int, email: str, db: Session = Depends(get_users_polls_db)):
     """
     Validates a vote.
     """
