@@ -95,6 +95,14 @@ def post_vote(vote: VoteIn, db: Session):
     else:
         raise InactivePollError(f"There is not an open poll with ID {vote.poll_id}")
 
+def validate_vote(db: Session, poll_id, email):
+    vote = db.query(db_models.Vote).filter(db_models.Vote.poll_id == poll_id).filter(db_models.Vote.username == email).first()
+    if not vote:
+        return False
+    else:
+        vote.validated = True
+        db.commit()
+        return vote 
 
 def get_votes(poll_id: int, db: Session):
     query = """SELECT username, vote_timestamp, title, value
