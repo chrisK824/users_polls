@@ -78,7 +78,7 @@ def post_vote(vote: VoteIn, db: Session):
         if option:
             try:
                 db_vote_entry = db_models.Vote(
-                    username=vote.username,
+                    email=vote.email,
                     option_id=vote.option_id,
                     poll_id=vote.poll_id
                 )
@@ -88,7 +88,7 @@ def post_vote(vote: VoteIn, db: Session):
             except IntegrityError:
                 db.rollback()
                 raise DuplicateError(
-                    f"User {vote.username} has already voted for poll {vote.poll_id}")
+                    f"User {vote.email} has already voted for poll {vote.poll_id}")
         else:
             raise ValueError(
                 f"There is no option {vote.option_id} for poll {vote.poll_id}")
@@ -96,7 +96,7 @@ def post_vote(vote: VoteIn, db: Session):
         raise InactivePollError(f"There is not an open poll with ID {vote.poll_id}")
 
 def validate_vote(db: Session, poll_id, email):
-    vote = db.query(db_models.Vote).filter(db_models.Vote.poll_id == poll_id).filter(db_models.Vote.username == email).first()
+    vote = db.query(db_models.Vote).filter(db_models.Vote.poll_id == poll_id).filter(db_models.Vote.email == email).first()
     if not vote:
         return False
     else:
@@ -105,7 +105,7 @@ def validate_vote(db: Session, poll_id, email):
         return vote 
 
 def get_votes(poll_id: int, db: Session):
-    query = """SELECT username, vote_timestamp, title, value
+    query = """SELECT email, vote_timestamp, title, value
     FROM votes INNER JOIN options ON votes.option_id = options.id
     INNER JOIN polls ON options.poll_id = polls.id
     WHERE votes.poll_id = (%s)
@@ -114,6 +114,6 @@ def get_votes(poll_id: int, db: Session):
     return votes
 
 def select_random_winner(poll_id : int, db : Session):
-    query = """SELECT username from votes WHERE poll_id = (%s) AND votes.validated = true ORDER BY RANDOM() LIMIT 1"""
-    username = db.execute(text(query % str(poll_id))).fetchone()[0]
-    return username
+    query = """SELECT email from votes WHERE poll_id = (%s) AND votes.validated = true ORDER BY RANDOM() LIMIT 1"""
+    email = db.execute(text(query % str(poll_id))).fetchone()[0]
+    return email

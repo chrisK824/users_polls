@@ -125,7 +125,7 @@ def get_votes(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls
 @usersPollsAPI.post("/v1/votes", summary ="Vote for an option of a given poll ID", tags=["Votes"])
 def vote_for_poll(vote : VoteIn, request : Request, db: Session = Depends(get_users_polls_db)):
     """
-    Votes as a username for
+    Votes as an email for
     an option of a,
     given poll ID.
     """
@@ -134,8 +134,8 @@ def vote_for_poll(vote : VoteIn, request : Request, db: Session = Depends(get_us
         base_url = str(request.base_url)
         base_url = base_url[:-1]
         validation_url = f"{base_url}/v1/votes/validation"
-        send_activation_email(poll_id=result.poll_id, email=result.username, url=validation_url)
-        return {"result" : f"Your vote has been submitted. In order to be taken into account you need to validate it using the link sent to your email @ {vote.username}"}
+        send_activation_email(poll_id=result.poll_id, email=result.email, url=validation_url)
+        return {"result" : f"Your vote has been submitted. In order to be taken into account you need to validate it using the link sent to your email @ {vote.email}"}
     except HTTPException as e:
         raise
     except ValueError as e:
@@ -164,7 +164,7 @@ def activate_user(poll_id : int, email: str, db: Session = Depends(get_users_pol
             status_code=500, detail=f"An unexpected error occured. Report this message to support: {e}")
 
 
-@usersPollsAPI.get("/v1/polls/{poll_id}/winner", summary ="Select random username as winner for a given poll ID", tags=["Polls winners"])
+@usersPollsAPI.get("/v1/polls/{poll_id}/winner", summary ="Select random email as winner for a given poll ID", tags=["Polls winners"])
 def get_poll_winner(poll_id : int = Query(ge=1), db: Session = Depends(get_users_polls_db)):
     """
     Select random username

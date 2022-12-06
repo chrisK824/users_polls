@@ -29,13 +29,13 @@ class Option(Base):
 
 class Vote(Base):
     __tablename__ = "votes"
-    username = Column(String)
+    email = Column(String)
     vote_timestamp = Column(DateTime, default=func.now())
     poll_id = Column(Integer, ForeignKey("polls.id"))
     option_id = Column(Integer, ForeignKey("options.id"))
     validated = Column(Boolean, default= False)
     __table_args__ = (PrimaryKeyConstraint(
-        'username', 'poll_id', name='username_poll'),)
+        'email', 'poll_id', name='email_poll'),)
 
     option = relationship(
         "Option", back_populates="votes", cascade="all,delete")
