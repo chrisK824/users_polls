@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List
 from datetime import datetime, date
 
 
 class VoteIn(BaseModel):
-    email: str
+    email: EmailStr
     poll_id: int = Field(..., gt=0)
     option_id: int = Field(..., gt=0)
 
